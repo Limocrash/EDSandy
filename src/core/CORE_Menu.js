@@ -1,0 +1,38 @@
+/** =============================
+ * CORE_Menu.gs   (src/core)
+ * One builder, two registries:
+ *   – DevTools  (default)
+ *   – Testing   (optional)
+ * Each module registers its items via
+ *   CORE_Menu.register(cb)          // DevTools
+ *   CORE_Menu.registerTesting(cb)   // Testing
+ *
+ * =============================*/
+
+var CORE_Menu = (function () {
+
+  const DEVTOOLS = [];
+  const TESTING  = [];
+
+  function build() {
+    const ui = SpreadsheetApp.getUi();
+
+    // ----- DevTools menu -----
+    const devMenu = ui.createMenu('DevTools');
+    DEVTOOLS.forEach(cb => cb(devMenu));
+    devMenu.addToUi();
+
+    // ----- Testing menu (only if items) -----
+    if (TESTING.length) {
+      const testMenu = ui.createMenu('Testing');
+      TESTING.forEach(cb => cb(testMenu));
+      testMenu.addToUi();
+    }
+  }
+
+  function register(cb)        { DEVTOOLS.push(cb); }
+  function registerTesting(cb) { TESTING.push(cb); }
+
+  return { build, register, registerTesting };
+
+})();

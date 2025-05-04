@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+      h2 { color: #4285f4; margin-top: 20px; margin-bottom: 10px; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+      th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
+      th { background-color: #f2f2f2; }
+      tr:hover { background-color: #f5f5f5; }
+      .system-status { display: flex; flex-wrap: wrap; gap: 10px; }
+      .status-card { 
+        flex: 1 0 30%; 
+        min-width: 200px;
+        border: 1px solid #ddd; 
+        border-radius: 4px; 
+        padding: 15px;
+        background-color: #f9f9f9;
+        }
+      .status-card h3 { margin-top: 0; color: #4285f4; }
+      .status-value { font-size: 24px; font-weight: bold; margin: 10px 0; }
+      .warning { color: orange; }
+      .error { color: red; }
+      .success { color: green; }
+      .tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #ccc; }
+      .tab { padding: 8px 15px; cursor: pointer; margin-right: 5px; }
+      .tab.active { border-bottom: 2px solid #4285f4; font-weight: bold; color: #4285f4; }
+      .tab-content { display: none; }
+      .tab-content.active { display: block; }
+      .action-button {
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        margin: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .action-button:hover {
+        background-color: #2a75f3;
+      }
+      .action-panel {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f2f2f2;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Family Budget System Status</h2>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('overview')">Overview</div>
+      <div class="tab" onclick="showTab('sheets')">Sheets</div>
+      <div class="tab" onclick="showTab('issues')">Issues</div>
+      <div class="tab" onclick="showTab('actions')">Actions</div>
+    </div>
+    
+     <div id="overview" class="tab-content active">
+      <div class="system-status">
+        <div class="status-card">
+          <h3>Expenses</h3>
+          <div class="status-value"><?= stats.expensesCount ?></div>
+          <div>Last expense: <?= stats.lastExpenseDate ?></div>
+        </div>
+        
+        <div class="status-card">
+          <h3>Active Loans</h3>
+          <div class="status-value"><?= stats.activeLoansCount ?></div>
+          <div>Last loan: <?= stats.lastLoanDate ?></div>
+        </div>
+        
+        <div class="status-card">
+          <h3>Categories</h3>
+          <div class="status-value"><?= stats.categoriesCount ?></div>
+        </div>
+        
+        <div class="status-card">
+          <h3>People</h3>
+          <div class="status-value"><?= stats.peopleCount ?></div>
+        </div>
+        
+        <div class="status-card">
+          <h3>Validation Errors</h3>
+          <div class="status-value <?= stats.validationErrorsCount > 0 ? 'error' : 'success' ?>"><?= stats.validationErrorsCount ?></div>
+          <? if (stats.validationErrorsCount > 0) { ?>
+              <div class="error">Errors need attention</div>
+          <? } else { ?>
+              <div class="success">No errors</div>
+          <? } ?>
+        </div>
+        
+        <div class="status-card">
+          <h3>Integrity</h3>
+          <div class="status-value <?= stats.inconsistentReferences.length > 0 ? 'warning' : 'success' ?>"><?= stats.inconsistentReferences.length ?></div>
+          <? if (stats.inconsistentReferences.length > 0) { ?>
+              <div class="warning">Issues found</div>
+          <? } else { ?>
+              <div class="success">No issues</div>
+          <? } ?>
+        </div>
+      </div>
+      
+      <h3>System Status</h3>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Status</th>
+        </tr>
+        <tr>
+          <td>Google Sheets Database</td>
+          <td class="success">✓ Online</td>
+        </tr>
+        <tr>
+          <td>Receipt Storage</td>
+          <td class="<?= stats.receiptsWithoutLinks > 0 ? 'warning' : 'success' ?>">
+            <? if (stats.receiptsWithoutLinks > 0) { ?>
+                ⚠ <?= stats.receiptsWithoutLinks ?> missing receipts
+            <? } else { ?>
+                ✓ All receipts accessible
+            <? } ?>
+          </td>
+        </tr>
+        <tr>
+          <td>Forms Integration</td>
+          <td class="success">✓ Connected</td>
+        </tr>
+        <tr>
+          <td>Dashboard</td>
+          <td class="<?= stats.sheetSizes['Dashboard'] ? 'success' : 'warning' ?>">
+            <? if (stats.sheetSizes['Dashboard']) { ?>
+                ✓ Active
+            <? } else { ?>
+                ⚠ Not found
+            <? } ?>
+          </td>
+        </tr>
+        <tr>
+          <td>Recurring Transactions</td>
+          <td class="<?= stats.sheetSizes['RecurringTransactions'] ? 'success' : 'warning' ?>">
+            <? if (stats.sheetSizes['RecurringTransactions']) { ?>
+                ✓ Configured
+            <? } else { ?>
+                ⚠ Not set up
+            <? } ?>
+          </td>
+        </tr>
+      </table>
+    </div>
+    
+    <div id="sheets" class="tab-content">
+      <h3>Sheet Statistics</h3>
+      <table>
+        <tr>
+          <th>Sheet Name</th>
+          <th>Rows</th>
+          <th>Columns</th>
+          <th>Status</th>
+        </tr>
+        <? for (var name in stats.sheetSizes) { ?>
+          <tr>
+            <td><?= name ?></td>
+            <td><?= stats.sheetSizes[name].rows ?></td>
+            <td><?= stats.sheetSizes[name].cols ?></td>
+            <td class="success">✓</td>
+          </tr>
+        <? } ?>
+      </table>
+    </div>
+    
+    <div id="issues" class="tab-content">
+      <h3>Data Integrity Issues</h3>
+      <? if (stats.inconsistentReferences.length === 0) { ?>
+        <p class="success">No data integrity issues found.</p>
+      <? } else { ?>
+        <table>
+          <tr>
+            <th>Issue Type</th>
+            <th>Details</th>
+            <th>Affected IDs</th>
+          </tr>
+          <? for (var i = 0; i < stats.inconsistentReferences.length; i++) { 
+               var issue = stats.inconsistentReferences[i]; ?>
+            <tr>
+              <td><?= issue.type ?></td>
+              <td><?= issue.description ?></td>
+              <td><?= issue.ids.join(', ') ?></td>
+            </tr>
+          <? } ?>
+        </table>
+      <? } ?>
+      
+      <h3>Validation Errors</h3>
+      <? if (stats.validationErrorsCount === 0) { ?>
+        <p class="success">No validation errors found.</p>
+      <? } else { ?>
+        <p class="error">There are <?= stats.validationErrorsCount ?> validation errors. Check the ValidationErrors sheet for details.</p>
+      <? } ?>
+      
+      <h3>Receipt Issues</h3>
+      <? if (stats.receiptsWithoutLinks === 0) { ?>
+        <p class="success">All receipt links are valid.</p>
+      <? } else { ?>
+        <p class="warning">There are <?= stats.receiptsWithoutLinks ?> expenses with broken receipt links.</p>
+      <? } ?>
+    </div>
+    
+    <div id="actions" class="tab-content">
+      <h3>System Maintenance</h3>
+      
+      <div class="action-panel">
+        <h4>Database Maintenance</h4>
+        <button class="action-button" onclick="runAction('updateFormDropdowns')">Update Form Dropdowns</button>
+        <button class="action-button" onclick="runAction('setupDataValidation')">Setup Data Validation</button>
+        <button class="action-button" onclick="runAction('generateSchema')">Generate Schema</button>
+      </div>
+      
+      <div class="action-panel">
+        <h4>Recurring Transactions</h4>
+        <button class="action-button" onclick="runAction('processRecurringTransactions')">Process Recurring Transactions</button>
+        <button class="action-button" onclick="runAction('setupRecurringTransactionsTrigger')">Setup Daily Trigger</button>
+      </div>
+      
+      <div class="action-panel">
+        <h4>Dashboard</h4>
+        <button class="action-button" onclick="runAction('updateDashboard')">Update Dashboard</button>
+      </div>
+      
+      <div class="action-panel">
+        <h4>Advanced Maintenance</h4>
+        <button class="action-button" onclick="runAction('fixBrokenReceipts')">Fix Broken Receipt Links</button>
+        <button class="action-button" onclick="runAction('cleanupValidationErrors')">Cleanup Validation Errors</button>
+        <button class="action-button" onclick="runAction('fixReferentialIntegrity')">Fix Referential Integrity</button>
+      </div>
+      
+      <div id="actionResult" style="margin-top: 20px; padding: 10px; display: none; background-color: #e8f0fe; border-radius: 4px;"></div>
+    </div>
+    
+    <script>
+      function showTab(tabName) {
+        // Hide all tabs
+        const tabs = document.getElementsByClassName('tab');
+        for (let i = 0; i < tabs.length; i++) {
+          tabs[i].classList.remove('active');
+        }
+        
+        const tabContents = document.getElementsByClassName('tab-content');
+        for (let i = 0; i < tabContents.length; i++) {
+          tabContents[i].classList.remove('active');
+        }
+        
+        // Show selected tab
+        document.getElementById(tabName).classList.add('active');
+        document.querySelector('.tab[onclick="showTab(\''+tabName+'\')"]').classList.add('active');
+      }
+      
+      function runAction(action) {
+        const actionResult = document.getElementById('actionResult');
+        actionResult.innerHTML = '<p>Running action: ' + action + '...</p>';
+        actionResult.style.display = 'block';
+        
+        google.script.run
+          .withSuccessHandler(function(result) {
+            actionResult.innerHTML = '<p class="success">✓ ' + result + '</p>';
+          })
+          .withFailureHandler(function(error) {
+            actionResult.innerHTML = '<p class="error">Error: ' + error + '</p>';
+          })
+          .runSystemAction(action);
+      }
+    </script>
+  </body>
+</html>

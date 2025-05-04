@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= include('Stylesheet'); ?>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Family Budget Dashboard</h1>
+        <div class="date-display"><?= todayDate ?></div>
+      </header>
+      
+      <div class="dashboard-menu">
+        <h2>Welcome to the <?= monthName ?> <?= year ?> Budget Dashboard</h2>
+        <p>Select a dashboard view below:</p>
+        
+        <div class="menu-cards">
+          <a href="<?= ScriptApp.getService().getUrl(); ?>?view=expenses" class="card">
+            <div class="card-icon">💰</div>
+            <h3>Monthly Expenses</h3>
+            <p>View this month's expenses and breakdown</p>
+          </a>
+          
+          <a href="<?= ScriptApp.getService().getUrl(); ?>?view=categories" class="card">
+            <div class="card-icon">📊</div>
+            <h3>Category Breakdown</h3>
+            <p>Expenses by category with charts</p>
+          </a>
+          
+          <a href="<?= ScriptApp.getService().getUrl(); ?>?view=loans" class="card">
+            <div class="card-icon">💸</div>
+            <h3>Active Loans</h3>
+            <p>View outstanding loans and balances</p>
+          </a>
+          
+          <a href="<?= ScriptApp.getService().getUrl(); ?>?view=transactions" class="card">
+            <div class="card-icon">📝</div>
+            <h3>Recent Transactions</h3>
+            <p>View the most recent expenses</p>
+          </a>
+        </div>
+      </div>
+      
+      <footer>
+        <p>Family Budget System &copy; <?= year ?></p>
+      </footer>
+    </div>
+  </body>
+</html>
