@@ -39,7 +39,7 @@ function DV_generateBudgieConfig() {
       } else {
         config[key] = `https://docs.google.com/forms/d/e/${value}/viewform`;
       }
-    } else if (type === "PUBLIC_URL" || type === "INTERNAL_URL" || type === "SHEET_ID") {
+    } else if (type === "PUBLIC_URL" || type === "INTERNAL_URL" || type === "SHEET_ID" || type === "SPREADSHEET_ID" || type === "SCRIPT_ID") {
       config[key] = value;
     }
   });
