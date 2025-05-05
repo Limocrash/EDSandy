@@ -46,7 +46,7 @@ function DV_generateBudgieConfig() {
 
   // Build JS output
   let js = "// Budgie Config - Auto-generated from Config! sheet\n";
-  js += "const BUDGIE_CONFIG = " + JSON.stringify(config, null, 2) + ";\n";
+  js += "window.BUDGIE_CONFIG = " + JSON.stringify(config, null, 2) + ";\n";
 
   Logger.log(js);
   return js;
