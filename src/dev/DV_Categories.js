@@ -41,6 +41,7 @@ function generateCategoryJSON() {
   if (files.hasNext()) files.next().setTrashed(true);
   DriveApp.createFile(fname, json, MimeType.PLAIN_TEXT);
 
-  SpreadsheetApp.getUi().alert('✅ categories.json regenerated');
+  SpreadsheetApp.getactivesheet().toast('JSON file created in Drive', 'Success', 5);
+  Logger.log('JSON file created in Drive:\n' + json);
   return json;
 }
