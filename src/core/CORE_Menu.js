@@ -15,38 +15,35 @@
 // testing menu items are registered in the   
 //   TESTING array, which is built in the
 //   build() function and added to the UI
+
+//   (if the array is not empty).
+//   The menu is built in the onOpen() trigger  
+//   (or onInstall() trigger).
 var CORE_Menu = (function () {
+
   const DEVTOOLS = [];
-  const TESTING = [];
+  const TESTING  = [];
 
-  function build() {
+  function registerDev(label, funcName) { DEVTOOLS.push([label, funcName]); }
+  function registerTest(label, funcName) { TESTING .push([label, funcName]); }
+
+  /** Build menus — silently abort in headless context */
+  function build(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    if (!ss) return;                          // Running headless (IDE) → skip
-  
-    const ui = SpreadsheetApp.getUi();        // ← call from SpreadsheetApp
-    
-  
+    if (!ss) return;                    // IDE / head‑less → skip, no error
 
-    // ----- DevTools menu -----
-    const devMenu = ui.createMenu('DevTools');
-    DEVTOOLS.forEach(cb => cb(devMenu));
-    devMenu.addToUi();
-
-    // ----- Testing menu (only if items) -----
+    const ui = SpreadsheetApp.getUi();
+    if (DEVTOOLS.length) {
+      const m = ui.createMenu('DevTools');
+      DEVTOOLS.forEach(([lbl,fn]) => m.addItem(lbl, fn));
+      m.addToUi();
+    }
     if (TESTING.length) {
-      const testMenu = ui.createMenu('Testing');
-      TESTING.forEach(cb => cb(testMenu));
-      testMenu.addToUi();
+      const m = ui.createMenu('Testing');
+      TESTING.forEach(([lbl,fn]) => m.addItem(lbl, fn));
+      m.addToUi();
     }
   }
 
-  // ----- Registering menu items -----
-  function register(cb) {
-    DEVTOOLS.push(cb);
-  }
-  function registerTesting(cb) {
-    TESTING.push(cb);
-  }
-
-  return { build, register, registerTesting };
+  return { registerDev, registerTest, build };
 })();

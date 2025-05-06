@@ -2,11 +2,14 @@
  * CORE_Bootstrap.gs   (src/core)
  *  ─ single location for ALL project triggers
  * =============================*/
+function onOpen(e) { CORE_Menu.build(e); }
+function onInstall(e) { onOpen(e); }     // needed if you ever publish
 
-function onOpen() {
-    CORE_Menu.build();         // assemble DevTools menu
-  }
-  
+/*********
+ * 
+ * Additional triggers to add later
+ * 
+ ********
   function onEdit(e) {
     // optional: central onEdit router
   }
@@ -18,3 +21,4 @@ function onOpen() {
   function doPost(e) {
     return CORE_Dispatch.doPost(e);
   }
+  */
