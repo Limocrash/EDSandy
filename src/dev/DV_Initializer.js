@@ -19,21 +19,21 @@
 
 (function(){
   /* DevTools items */
-  CORE_Menu.registerdev('Initialize System',          'initialize');
-  CORE_Menu.registerdev('View System Status',         'showSystemStatus');
-  CORE_Menu.registerdev('Process Form Responses',     'showProcessingDialog');
-  CORE_Menu.registerdev('Update Form Dropdowns',      'updateFormDropdowns');
-  CORE_Menu.registerdev('Reload Globals from Config', 'showGlobalsReloadTool');
-  CORE_Menu.registerdev('Quick Globals Check',        'quickGlobalsCheck');
+  CORE_Menu.registerDev('Initialize System',          'initialize');
+  CORE_Menu.registerDev('View System Status',         'showSystemStatus');
+  CORE_Menu.registerDev('Process Form Responses',     'showProcessingDialog');
+  CORE_Menu.registerDev('Update Form Dropdowns',      'updateFormDropdowns');
+  CORE_Menu.registerDev('Reload Globals from Config', 'showGlobalsReloadTool');
+  CORE_Menu.registerDev('Quick Globals Check',        'quickGlobalsCheck');
   });
 
   /* Testing items */
   (function(){
-    CORE_Menu.registerdev('Run All Tests',                'testBudgetSystemImprovements');
-    CORE_Menu.registerdev('Test Dashboard',               'updateDashboard');
-    CORE_Menu.registerdev('Test Recurring Transactions',  'processRecurringTransactions');
-    CORE_Menu.registerdev('Test Receipt Image Fix',       'testReceiptImageFix');
-    CORE_Menu.registerdev('Test Globals & Validation',    'quickGlobalsCheck');
+    CORE_Menu.registerDev('Run All Tests',                'testBudgetSystemImprovements');
+    CORE_Menu.registerDev('Test Dashboard',               'updateDashboard');
+    CORE_Menu.registerDev('Test Recurring Transactions',  'processRecurringTransactions');
+    CORE_Menu.registerDev('Test Receipt Image Fix',       'testReceiptImageFix');
+    CORE_Menu.registerDev('Test Globals & Validation',    'quickGlobalsCheck');
   })();
 
 
