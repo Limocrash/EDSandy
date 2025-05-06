@@ -21,9 +21,11 @@ var CORE_Menu = (function () {
 
   function build() {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    if (!ss) return; // Skip if IDE / headless
-
-    const ui = ss.getUi(); // Safe now
+    if (!ss) return;                          // Running headless (IDE) → skip
+  
+    const ui = SpreadsheetApp.getUi();        // ← call from SpreadsheetApp
+    
+  
 
     // ----- DevTools menu -----
     const devMenu = ui.createMenu('DevTools');
