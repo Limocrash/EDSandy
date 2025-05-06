@@ -16,12 +16,14 @@
 //   TESTING array, which is built in the
 //   build() function and added to the UI
 var CORE_Menu = (function () {
-
   const DEVTOOLS = [];
-  const TESTING  = [];
+  const TESTING = [];
 
   function build() {
-    const ui = SpreadsheetApp.getUi();
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (!ss) return; // Skip if IDE / headless
+
+    const ui = ss.getUi(); // Safe now
 
     // ----- DevTools menu -----
     const devMenu = ui.createMenu('DevTools');
@@ -37,19 +39,12 @@ var CORE_Menu = (function () {
   }
 
   // ----- Registering menu items -----
-  //   – DevTools (default)
-  //   – Testing (optional)
-  //   – each module registers its items via  
-  //     CORE_Menu.register(cb)          // DevTools
-  //     CORE_Menu.registerTesting(cb)   // Testing
-  //   – each callback receives the menu object
-  //     as an argument, and can add items
-  //     to it using the standard methods
-  //     (addItem, addSubMenu, etc.)
-
-  function register(cb)        { DEVTOOLS.push(cb); }
-  function registerTesting(cb) { TESTING.push(cb); }
+  function register(cb) {
+    DEVTOOLS.push(cb);
+  }
+  function registerTesting(cb) {
+    TESTING.push(cb);
+  }
 
   return { build, register, registerTesting };
-
 })();
