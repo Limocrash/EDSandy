@@ -7,9 +7,8 @@
  * Adds menu item for runBatchExpenseProcessing()
  */
 (function() {
-  CORE_Menu
-    .addItem("Reprocess Expense Form Rows", "runBatchExpenseReprocessing")
-});
+  CORE_Menu.registerDev("Reprocess Expense Form Rows", "runBatchExpenseReprocessing")
+})();
 
 /**
  * Prompts user for row range and reprocesses each using Form Engine

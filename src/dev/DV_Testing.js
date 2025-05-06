@@ -48,13 +48,4 @@ function quickGlobalsCheck() {
   validateGlobals();
 }
 
-/**
- * Adds the quick globals check to the Dev Tools menu
- */
-function addGlobalsMenu() {
-  const ui = SpreadsheetApp.getUi();
-  ui.createMenu("Dev Tools")
-    .addItem("Reload Globals from Config", "showGlobalsReloadTool")
-    .addItem("Quick Globals Check", "quickGlobalsCheck")
-    .addToUi();
-}
+

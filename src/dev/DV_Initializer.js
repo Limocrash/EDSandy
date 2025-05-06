@@ -19,24 +19,22 @@
 
 (function(){
   /* DevTools items */
-  CORE_Menu.register(menu => {
-    menu.addItem('Initialize System',          'initialize');
-    menu.addItem('View System Status',         'showSystemStatus');
-    menu.addItem('Process Form Responses',     'showProcessingDialog');
-    menu.addItem('Update Form Dropdowns',      'updateFormDropdowns');
-    menu.addItem('Reload Globals from Config', 'showGlobalsReloadTool');
-    menu.addItem('Quick Globals Check',        'quickGlobalsCheck');
+  CORE_Menu.registerdev('Initialize System',          'initialize');
+  CORE_Menu.registerdev('View System Status',         'showSystemStatus');
+  CORE_Menu.registerdev('Process Form Responses',     'showProcessingDialog');
+  CORE_Menu.registerdev('Update Form Dropdowns',      'updateFormDropdowns');
+  CORE_Menu.registerdev('Reload Globals from Config', 'showGlobalsReloadTool');
+  CORE_Menu.registerdev('Quick Globals Check',        'quickGlobalsCheck');
   });
 
   /* Testing items */
-  CORE_Menu.registerTesting(menu => {
-    menu.addItem('Run All Tests',                'testBudgetSystemImprovements');
-    menu.addItem('Test Dashboard',               'updateDashboard');
-    menu.addItem('Test Recurring Transactions',  'processRecurringTransactions');
-    menu.addItem('Test Receipt Image Fix',       'testReceiptImageFix');
-    menu.addItem('Test Globals & Validation',    'quickGlobalsCheck');
-  });
-})();
+  (function(){
+    CORE_Menu.registerdev('Run All Tests',                'testBudgetSystemImprovements');
+    CORE_Menu.registerdev('Test Dashboard',               'updateDashboard');
+    CORE_Menu.registerdev('Test Recurring Transactions',  'processRecurringTransactions');
+    CORE_Menu.registerdev('Test Receipt Image Fix',       'testReceiptImageFix');
+    CORE_Menu.registerdev('Test Globals & Validation',    'quickGlobalsCheck');
+  })();
 
 
 // Global variables for sheet access
@@ -54,7 +52,7 @@ let SPREADSHEET,
 /***************
  * Form IDs
  *
- *  These are the CURRENT IDs of the Google Forms used in the
+ *  ThaddItemese are the CURRENT IDs of the Google Forms used in the
  *  system as of 25-05-04. The hard declaratations below
  *  are used to set up triggers for form submissions until
  *  a dynamic solution is implemented. 

@@ -6,10 +6,8 @@
 
 // ---- DevTools menu hook -----------------------------------------
 (function(){
-  CORE_Menu.register(menu => {
-    menu.addItem('Generate Category JSON', 'generateCategoryJSON');
-  });
-})();
+  CORE_Menu.registerDev('Generate Category JSON', 'generateCategoryJSON');
+  })();
 
 // ---- actual utility ---------------------------------------------
 function generateCategoryJSON() {

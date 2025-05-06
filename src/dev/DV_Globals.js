@@ -26,9 +26,8 @@ function showGlobalsReloadTool() {
   }
   
   // Add to Dev Tools menu (Optional)
-  (function () {
-    CORE_Menu.register(menu => {
-      menu.addItem("Reload Globals from Config", "showGlobalsReloadTool");
-  });
-});
+  
+    (function(){
+  CORE_Menu.registerDev("Reload Globals from Config", "showGlobalsReloadTool");
+  })();
   
