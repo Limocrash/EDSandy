@@ -1,58 +1,61 @@
-function doGet(e){
-  const act = String(e.parameter.action || '');
+/**
+ * API_Router.gs
+ * Single entry point for web‑app requests (GET, POST, OPTIONS)
+ */
+function doGet(e) {
+  const act = (e.parameter.action || '').toString();
 
-  switch (act){
+  switch (act) {
     case 'getCategories':
-      return withCors_( ContentService
-              .createTextOutput(generateCategoryJSON())
-              .setMimeType(ContentService.MimeType.JSON) );
-
-    // >>> remove the old fallback to DashboardPage
+      return jsonOk(generateCategoryJSON());
     default:
-      return withCors_( ContentService
-              .createTextOutput(
-                JSON.stringify({error:true,msg:'Unknown action'})
-              ).setMimeType(ContentService.MimeType.JSON) );
+      // fallback — serve dashboard page
+      return HtmlService.createHtmlOutputFromFile('DashboardPage');
   }
 }
 
-function doPost(e){
-  const body = JSON.parse(e.postData.contents || '{}');
-  const act  = body.action || '';
+function doPost(e) {
+  // handle real POST payloads
+  try {
+    const data = JSON.parse(e.postData.contents || '{}');
 
-  switch (act){
-    case 'addExpense':
-      const id = appendExpense_(body);        // helper below
-      return withCors_( ContentService
-              .createTextOutput(JSON.stringify({ok:true, expenseID:id}))
-              .setMimeType(ContentService.MimeType.JSON) );
-
-    default:
-      return withCors_( ContentService
-              .createTextOutput(
-                JSON.stringify({error:true,msg:'Unknown action'})
-              ).setMimeType(ContentService.MimeType.JSON) );
+    switch (data.action) {
+      case 'addExpense':
+        const id = saveExpense(data);           // <-- your own util
+        return jsonOk({ ok: true, expenseID: id });
+      default:
+        return jsonErr('Unknown action');
+    }
+  } catch (err) {
+    return jsonErr(err.message || 'Server error');
   }
 }
 
-// ---- helpers -------------------------------------------------
-function appendExpense_(d){
-  const sh = SpreadsheetApp.getActiveSpreadsheet()
-             .getSheetByName('Form Responses 6 Backup');
-  sh.appendRow([
-    new Date(d.date),
-    d.amount,
-    d.category,
-    d.subcategory,
-    d.description,
-    d.payMethod,
-    (d.beneficiaries||[]).join(',')
-  ]);
-  return sh.getLastRow();
+/**
+ * Pre‑flight CORS ping: always return 200 + headers
+ */
+function doOptions() {
+  return jsonOk({}, /*isOptions=*/true);
 }
 
-function withCors_(out){
-  return out.setHeader('Access-Control-Allow-Origin','*')
-            .setHeader('Access-Control-Allow-Methods','GET,POST,OPTIONS')
-            .setHeader('Access-Control-Allow-Headers','Content-Type');
+/* ---------- helpers ---------- */
+
+function jsonOk(obj, isOptions) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin',   '*')
+    .setHeader('Access-Control-Allow-Methods',  'POST, GET, OPTIONS')
+    .setHeader('Access-Control-Allow-Headers',  'Content-Type')
+    .setHeader('Access-Control-Max-Age',        '3600')      // cache pre‑flight
+    .setHeader('Access-Control-Allow-Credentials', 'true')
+    // OPTIONS requests must not include a body, so return early
+    .setContent(isOptions ? '' : JSON.stringify(obj));
+}
+
+function jsonErr(msg) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok:false, msg }))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*');
 }
