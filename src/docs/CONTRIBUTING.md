@@ -20,3 +20,13 @@
 * Only **CORE_Bootstrap.gs** defines onOpen, onEdit, doGet, doPost.
 * All modules add menu items via CORE_Menu.register(…) or registerTesting(…).
 * All new web‑app endpoints expose pure functions and are wired in CORE_Dispatch.
+
+### Web‑app routes (v0.1.15 and later)
+
+| Verb | Route                                  | Purpose                    |
+|------|----------------------------------------|----------------------------|
+| GET  | `/exec?action=getCategories`           | Returns `{ "Cat":[Subs] }` |
+| POST | `/exec` body:`{action:"addExpense",…}` | Appends one expense row    |
+
+Routes are handled by `src/api/API_Router.gs`.  
+Only add new routes via **that file’s switch blocks**.

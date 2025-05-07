@@ -1,39 +1,58 @@
-/**
- * API_Router.gs
- * — single entry‑point for all web‑app calls
- * ------------------------------------------------
- *  GET  ?action=getCategories          → AP_Categories.generateCategoryJSON()
- *  POST body.action=addExpense         → AP_Expenses.addExpense(data)
- */
-function doGet(e) {
-  const action = (e.parameter.action || '').toString();
+function doGet(e){
+  const act = String(e.parameter.action || '');
 
-  switch (action) {
+  switch (act){
     case 'getCategories':
-      return ContentService
-             .createTextOutput(AP_Categories.generateCategoryJSON())
-             .setMimeType(ContentService.MimeType.JSON);
+      return withCors_( ContentService
+              .createTextOutput(generateCategoryJSON())
+              .setMimeType(ContentService.MimeType.JSON) );
 
+    // >>> remove the old fallback to DashboardPage
     default:
-      // fallback – serve dashboard so hitting base URL still shows something
-      return HtmlService.createHtmlOutputFromFile('DashboardPage');
+      return withCors_( ContentService
+              .createTextOutput(
+                JSON.stringify({error:true,msg:'Unknown action'})
+              ).setMimeType(ContentService.MimeType.JSON) );
   }
 }
 
-function doPost(e) {
-  // expect JSON body: {action:"addExpense", ...payload }
-  const body   = JSON.parse(e.postData.contents || '{}');
-  const action = (body.action || '').toString();
+function doPost(e){
+  const body = JSON.parse(e.postData.contents || '{}');
+  const act  = body.action || '';
 
-  switch (action) {
+  switch (act){
     case 'addExpense':
-      return ContentService.createTextOutput(
-               JSON.stringify(AP_Expenses.addExpense(body))
-             ).setMimeType(ContentService.MimeType.JSON);
+      const id = appendExpense_(body);        // helper below
+      return withCors_( ContentService
+              .createTextOutput(JSON.stringify({ok:true, expenseID:id}))
+              .setMimeType(ContentService.MimeType.JSON) );
 
     default:
-      return ContentService.createTextOutput(
-               JSON.stringify({ok:false,msg:'Unknown POST action'})
-             ).setMimeType(ContentService.MimeType.JSON);
+      return withCors_( ContentService
+              .createTextOutput(
+                JSON.stringify({error:true,msg:'Unknown action'})
+              ).setMimeType(ContentService.MimeType.JSON) );
   }
+}
+
+// ---- helpers -------------------------------------------------
+function appendExpense_(d){
+  const sh = SpreadsheetApp.getActiveSpreadsheet()
+             .getSheetByName('Form Responses 6 Backup');
+  sh.appendRow([
+    new Date(d.date),
+    d.amount,
+    d.category,
+    d.subcategory,
+    d.description,
+    d.payMethod,
+    (d.beneficiaries||[]).join(',')
+  ]);
+  return sh.getLastRow();
+}
+
+function withCors_(out){
+  return out.setHeader('Access-Control-Allow-Origin','*')
+            .setHeader('Access-Control-Allow-Methods','GET,POST,OPTIONS')
+            .setHeader('Access-Control-Allow-Headers','Content-Type');
 }
