@@ -26,4 +26,29 @@ function doGet(e) {
   }
 }
 
+function doPost(e){
+  const data = JSON.parse(e.postData.contents);
+
+  // convert ["P001","P003"] → "P001,P003" for now
+  const benCSV = (data.beneficiaries || []).join(',');
+
+  // append to Form Responses 6 backup sheet
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+                .getSheetByName('Form Responses 6 Backup');
+  sheet.appendRow([
+    new Date(data.date),
+    data.amount,
+    data.category,
+    data.subcategory,
+    data.description,
+    data.payMethod,
+    benCSV
+  ]);
+
+  return ContentService.createTextOutput(
+            JSON.stringify({ok:true, expenseID: sheet.getLastRow()}))
+          .setMimeType(ContentService.MimeType.JSON);
+}
+
+
   
