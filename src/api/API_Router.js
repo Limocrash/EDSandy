@@ -39,18 +39,19 @@ function doOptions() {
 }
 
 /* ---------- helpers ---------- */
-
 function jsonOk(obj, isOptions) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin',   '*')
-    .setHeader('Access-Control-Allow-Methods',  'POST, GET, OPTIONS')
-    .setHeader('Access-Control-Allow-Headers',  'Content-Type')
-    .setHeader('Access-Control-Max-Age',        '3600')      // cache pre‑flight
-    .setHeader('Access-Control-Allow-Credentials', 'true')
-    // OPTIONS requests must not include a body, so return early
-    .setContent(isOptions ? '' : JSON.stringify(obj));
+  const out = ContentService
+      .createTextOutput(isOptions ? '' : JSON.stringify(obj))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  // CORS headers
+  out.setHeader('Access-Control-Allow-Origin',      '*');
+  out.setHeader('Access-Control-Allow-Methods',     'POST, GET, OPTIONS');
+  out.setHeader('Access-Control-Allow-Headers',     'Content-Type');
+  out.setHeader('Access-Control-Max-Age',           '3600');
+  out.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  return out;
 }
 
 function jsonErr(msg) {
