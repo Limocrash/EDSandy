@@ -13,47 +13,64 @@ function addCorsHeaders(response) {
   return response;
 }
 
-// ---------- GET ----------
+// ---------- Main Entry Point ----------
 function doGet(e) {
-  const act = (e.parameter.action || '').toString();
-
-  let response;
-  switch (act) {
-    case 'getCategories':
-      response = jsonOk(generateCategoryJSON());
-      break;
-    default:
-      // Fallback – serve the dashboard HTML
-      response = HtmlService.createHtmlOutputFromFile('DashboardPage');
-  }
-
-  return addCorsHeaders(response);
+  return handleRequest('GET', e);
 }
 
-// ---------- POST ----------
 function doPost(e) {
-  let response;
-  try {
-    const data = JSON.parse(e.postData.contents || '{}');
+  return handleRequest('POST', e);
+}
 
-    switch (data.action) {
-      case 'addExpense':
-        const id = saveExpense(data); // <-- your own util
-        response = jsonOk({ ok: true, expenseID: id });
+function doOptions(e) {
+  return handleRequest('OPTIONS', e);
+}
+
+// ---------- Request Router ----------
+function handleRequest(method, e) {
+  let response;
+
+  if (method === 'OPTIONS') {
+    // Handle CORS preflight
+    response = ContentService.createTextOutput('');
+    return addCorsHeaders(response);
+  }
+
+  if (method === 'GET') {
+    const act = (e.parameter.action || '').toString();
+
+    switch (act) {
+      case 'getCategories':
+        response = jsonOk(generateCategoryJSON());
         break;
       default:
-        response = jsonOk({ ok: false, msg: 'Unknown action' });
+        // Fallback – serve the dashboard HTML
+        response = HtmlService.createHtmlOutputFromFile('DashboardPage');
     }
-  } catch (err) {
-    response = jsonOk({ ok: false, msg: err.message || 'Server error' });
+
+    return addCorsHeaders(response);
   }
 
-  return addCorsHeaders(response);
-}
+  if (method === 'POST') {
+    try {
+      const data = JSON.parse(e.postData.contents || '{}');
 
-// ---------- OPTIONS (CORS pre-flight) ----------
-function doOptions() {
-  // Empty 200 OK is enough for modern browsers
-  const response = ContentService.createTextOutput('');
+      switch (data.action) {
+        case 'addExpense':
+          const id = saveExpense(data); // <-- your own util
+          response = jsonOk({ ok: true, expenseID: id });
+          break;
+        default:
+          response = jsonOk({ ok: false, msg: 'Unknown action' });
+      }
+    } catch (err) {
+      response = jsonOk({ ok: false, msg: err.message || 'Server error' });
+    }
+
+    return addCorsHeaders(response);
+  }
+
+  // Default response for unsupported methods
+  response = jsonOk({ ok: false, msg: 'Unsupported HTTP method' });
   return addCorsHeaders(response);
 }
