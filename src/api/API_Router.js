@@ -76,12 +76,9 @@ function handleRequest(method, e) {
     return addCorsHeaders(response);
   }
 
+  // Default response for unsupported methods
   console.log('Unsupported HTTP method');
   response = jsonOk({ ok: false, msg: 'Unsupported HTTP method' });
   return addCorsHeaders(response);
 }
 
-  // Default response for unsupported methods
-  response = jsonOk({ ok: false, msg: 'Unsupported HTTP method' });
-  return addCorsHeaders(response);
-}
