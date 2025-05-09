@@ -28,23 +28,26 @@ function doOptions(e) {
 
 // ---------- Request Router ----------
 function handleRequest(method, e) {
+  console.log(`Handling ${method} request`);
+
   let response;
 
   if (method === 'OPTIONS') {
-    // Handle CORS preflight
+    console.log('Handling OPTIONS request');
     response = ContentService.createTextOutput('');
     return addCorsHeaders(response);
   }
 
   if (method === 'GET') {
+    console.log('Handling GET request');
     const act = (e.parameter.action || '').toString();
+    console.log(`Action: ${act}`);
 
     switch (act) {
       case 'getCategories':
         response = jsonOk(generateCategoryJSON());
         break;
       default:
-        // Fallback – serve the dashboard HTML
         response = HtmlService.createHtmlOutputFromFile('DashboardPage');
     }
 
@@ -52,23 +55,31 @@ function handleRequest(method, e) {
   }
 
   if (method === 'POST') {
+    console.log('Handling POST request');
     try {
       const data = JSON.parse(e.postData.contents || '{}');
+      console.log(`POST data: ${JSON.stringify(data)}`);
 
       switch (data.action) {
         case 'addExpense':
-          const id = saveExpense(data); // <-- your own util
+          const id = saveExpense(data);
           response = jsonOk({ ok: true, expenseID: id });
           break;
         default:
           response = jsonOk({ ok: false, msg: 'Unknown action' });
       }
     } catch (err) {
+      console.error(`Error in POST: ${err.message}`);
       response = jsonOk({ ok: false, msg: err.message || 'Server error' });
     }
 
     return addCorsHeaders(response);
   }
+
+  console.log('Unsupported HTTP method');
+  response = jsonOk({ ok: false, msg: 'Unsupported HTTP method' });
+  return addCorsHeaders(response);
+}
 
   // Default response for unsupported methods
   response = jsonOk({ ok: false, msg: 'Unsupported HTTP method' });
