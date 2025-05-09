@@ -7,10 +7,9 @@ function jsonOk(obj) {
 
 // Helper to add CORS headers
 function addCorsHeaders(response) {
-  const headers = response.getHeaders();
-  headers['Access-Control-Allow-Origin'] = '*'; // Allow all origins
-  headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
-  headers['Access-Control-Allow-Headers'] = 'Content-Type';
+  response.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   return response;
 }
 
@@ -55,6 +54,6 @@ function doPost(e) {
 // ---------- OPTIONS (CORS pre-flight) ----------
 function doOptions() {
   // Empty 200 OK is enough for modern browsers
-  const response = jsonOk({ ok: true });
+  const response = ContentService.createTextOutput('');
   return addCorsHeaders(response);
 }
