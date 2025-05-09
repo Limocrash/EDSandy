@@ -2,6 +2,8 @@
  * API_Router.gs
  * Single entry point for web‑app requests (GET, POST, OPTIONS)
  */
+
+// ---------- GET ----------
 function doGet(e) {
   const act = (e.parameter.action || '').toString();
 
@@ -9,54 +11,37 @@ function doGet(e) {
     case 'getCategories':
       return jsonOk(generateCategoryJSON());
     default:
-      // fallback — serve dashboard page
+      // Fallback – serve the dashboard HTML
       return HtmlService.createHtmlOutputFromFile('DashboardPage');
   }
 }
 
+// ---------- POST ----------
 function doPost(e) {
-  // handle real POST payloads
   try {
     const data = JSON.parse(e.postData.contents || '{}');
 
     switch (data.action) {
       case 'addExpense':
-        const id = saveExpense(data);           // <-- your own util
+        const id = saveExpense(data);            // <-- your own util
         return jsonOk({ ok: true, expenseID: id });
       default:
-        return jsonErr('Unknown action');
+        return jsonOk({ ok: false, msg: 'Unknown action' });
     }
   } catch (err) {
-    return jsonErr(err.message || 'Server error');
+    return jsonOk({ ok: false, msg: err.message || 'Server error' });
   }
 }
 
-/**
- * Pre‑flight CORS ping: always return 200 + headers
- */
+// ---------- OPTIONS (CORS pre‑flight) ----------
 function doOptions() {
-  return jsonOk({}, /*isOptions=*/true);
+  // Empty 200 OK is enough for modern browsers
+  return jsonOk({ ok: true });
 }
 
-/* ---------- helpers ---------- */
-function jsonOk(obj, isOptions) {
-  const out = ContentService
-      .createTextOutput(isOptions ? '' : JSON.stringify(obj))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  // CORS headers
-  out.setHeader('Access-Control-Allow-Origin',      '*');
-  out.setHeader('Access-Control-Allow-Methods',     'POST, GET, OPTIONS');
-  out.setHeader('Access-Control-Allow-Headers',     'Content-Type');
-  out.setHeader('Access-Control-Max-Age',           '3600');
-  out.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  return out;
-}
-
-function jsonErr(msg) {
+// ---------- tiny helper ----------
+function jsonOk(obj) {
   return ContentService
-    .createTextOutput(JSON.stringify({ ok:false, msg }))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*');
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
