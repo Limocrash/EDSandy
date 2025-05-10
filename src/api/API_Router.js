@@ -7,9 +7,9 @@ function jsonOk(obj) {
 
 // Helper to add CORS headers
 function addCorsHeaders(response) {
-  response.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  response.addHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+  response.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.addHeader('Access-Control-Allow-Headers', 'Content-Type');
   return response;
 }
 
@@ -81,4 +81,3 @@ function handleRequest(method, e) {
   response = jsonOk({ ok: false, msg: 'Unsupported HTTP method' });
   return addCorsHeaders(response);
 }
-
