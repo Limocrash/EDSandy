@@ -1,16 +1,16 @@
 // ---------- tiny helper ----------
 function jsonOk(obj) {
-  return HtmlService.createHtmlOutput(JSON.stringify(obj))
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 // Helper to add CORS headers
 function addCorsHeaders(response) {
-  return response
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .addMetaTag('Access-Control-Allow-Origin', '*')
-    .addMetaTag('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .addMetaTag('Access-Control-Allow-Headers', 'Content-Type');
+  response.addHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+  response.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.addHeader('Access-Control-Allow-Headers', 'Content-Type');
+  return response;
 }
 
 // ---------- Main Entry Point ----------
@@ -34,7 +34,7 @@ function handleRequest(method, e) {
 
   if (method === 'OPTIONS') {
     console.log('Handling OPTIONS request');
-    response = HtmlService.createHtmlOutput('');
+    response = ContentService.createTextOutput('');
     return addCorsHeaders(response);
   }
 
