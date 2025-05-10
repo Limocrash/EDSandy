@@ -45,10 +45,14 @@ function handleRequest(method, e) {
 
     switch (act) {
       case 'getCategories':
-        response = jsonOk(generateCategoryJSON());
+        // Example: Proxying a request to an external URL
+        const url = 'https://example.com/categories.json'; // Replace with your actual URL
+        const fetchResponse = URLFetchApp.fetch(url, { method: 'get' });
+        const jsonResponse = fetchResponse.getContentText();
+        response = jsonOk(JSON.parse(jsonResponse));
         break;
       default:
-        response = HtmlService.createHtmlOutputFromFile('DashboardPage');
+        response = jsonOk({ ok: false, msg: 'Unknown action' });
     }
 
     return addCorsHeaders(response);
@@ -62,8 +66,15 @@ function handleRequest(method, e) {
 
       switch (data.action) {
         case 'addExpense':
-          const id = saveExpense(data); // Replace with your actual implementation
-          response = jsonOk({ ok: true, expenseID: id });
+          // Example: Proxying a POST request to an external URL
+          const url = 'https://example.com/addExpense'; // Replace with your actual URL
+          const fetchResponse = URLFetchApp.fetch(url, {
+            method: 'post',
+            payload: JSON.stringify(data),
+            contentType: 'application/json',
+          });
+          const jsonResponse = fetchResponse.getContentText();
+          response = jsonOk(JSON.parse(jsonResponse));
           break;
         default:
           response = jsonOk({ ok: false, msg: 'Unknown action' });
