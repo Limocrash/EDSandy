@@ -1,16 +1,16 @@
 // ---------- tiny helper ----------
 function jsonOk(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
+  return HtmlService.createHtmlOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 // Helper to add CORS headers
 function addCorsHeaders(response) {
-  response.addHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-  response.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  response.addHeader('Access-Control-Allow-Headers', 'Content-Type');
-  return response;
+  return response
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('Access-Control-Allow-Origin', '*')
+    .addMetaTag('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    .addMetaTag('Access-Control-Allow-Headers', 'Content-Type');
 }
 
 // ---------- Main Entry Point ----------
@@ -34,7 +34,7 @@ function handleRequest(method, e) {
 
   if (method === 'OPTIONS') {
     console.log('Handling OPTIONS request');
-    response = ContentService.createTextOutput('');
+    response = HtmlService.createHtmlOutput('');
     return addCorsHeaders(response);
   }
 
@@ -62,7 +62,7 @@ function handleRequest(method, e) {
 
       switch (data.action) {
         case 'addExpense':
-          const id = saveExpense(data);
+          const id = saveExpense(data); // Replace with your actual implementation
           response = jsonOk({ ok: true, expenseID: id });
           break;
         default:
