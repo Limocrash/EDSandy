@@ -13,16 +13,24 @@ function doGet(e) {
      * Returns live { "Category":[ "Sub", … ] } JSON
      */
     case 'getCategories':
-      return ContentService
-              .createTextOutput(generateCategoryJSON())     // reuse generator
-              .setMimeType(ContentService.MimeType.JSON);
-
+      var json = generateCategoryJSON();
+      if (e.parameter.callback) {                       // JSON‑P branch
+        return ContentService.createTextOutput(
+             e.parameter.callback + '(' + json + ');')
+           .setMimeType(ContentService.MimeType.JAVASCRIPT);
+      }
+    // -------- raw‑JSON branch (front‑end uses this) -------------
+    return ContentService.createTextOutput(json)
+      .setMimeType(ContentService.MimeType.JSON);
     // you can add more API routes later …
     // case 'addExpense': …
 
     default:
-      // Fallback: serve the dashboard HTML
-      return HtmlService.createHtmlOutputFromFile('DashboardPage');
+      // Fallback: 
+      return ContentService.createTextOutput(
+        '👋  “These aren’t the endpoints you’re looking for. Move along.” – Obi‑Wan')
+        .setMimeType(ContentService.MimeType.TEXT);
+
   }
 }
 
