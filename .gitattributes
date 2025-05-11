@@ -1,0 +1,4 @@
+# keep all JSON (and GAS) files LF so they match the IDE
+*.json   text eol=lf
+*.gs     text eol=lf
+*.html   text eol=lf
