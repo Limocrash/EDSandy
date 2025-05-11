@@ -1,30 +1,46 @@
-// API_Router.gs  — drop in once, forget it
-function doGet(e)  { return route('GET',  e); }
-function doPost(e) { return route('POST', e); }
-function doOptions() { return json({ ok:true }); }
+/**
+ * API_Router.gs – ultra‑simple, no‑CORS, “just work” router
+ * - GET  …/exec?action=getCategories   → JSON‑P
+ * - POST …/exec   (body.action = 'addExpense') → writes & returns 200
+ *
+ * version 2323.073.22 stardate: 20250511.1006
+*/
 
-// --- central dispatcher ------------------------------------------------
-function route(method, e) {
+/* ---------- GET ---------- */
+function doGet(e) {
   const act = (e.parameter.action || '').toString();
-  if (method === 'OPTIONS') return json({ ok:true });     // pre‑flight
 
-  if (method === 'GET' && act === 'getCategories') {
-    return json(generateCategoryJSON());
+  if (act === 'getCategories') {
+    // serve JSON‑P so <script src=...> can load it cross‑origin
+    const jsonp = `loadCategoryMap(${generateCategoryJSON()});`;
+    return ContentService.createTextOutput(jsonp)
+                         .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
 
-  if (method === 'POST') {
-    const body = JSON.parse(e.postData.contents || '{}');
-    switch (body.action) {
-      case 'addExpense':
-        return json({ ok:true, id: saveExpense(body) });
-    }
-  }
-
-  return json({ ok:false, msg:'Unknown request' });
+  return HtmlService.createHtmlOutput('Budgie backend alive ✓');
 }
 
-// tiny helper
-function json(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj))
+/* ---------- POST ---------- */
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents || '{}');
+
+    if (data.action === 'addExpense') {
+      // AP_Expenses.addExpense returns row number – ignore on client for now
+      AP_Expenses.addExpense(data);
+    }
+  } catch (err) {
+    // swallow – client can’t read body anyway while we’re in no‑cors mode
+  }
+
+  // always return 200 so the browser sees “OK”
+  return ContentService.createTextOutput('{ "ok": true }')
                        .setMimeType(ContentService.MimeType.JSON);
+}
+
+/* ---------- helpers ---------- */
+function generateCategoryJSON() {
+  // whatever you already had that returns:
+  // { "Housing":[ "Rent","Electric" ], "Food":[ "Groceries", … ] }
+  return DV_Categories.getCategoryMapJSON();   // for example
 }

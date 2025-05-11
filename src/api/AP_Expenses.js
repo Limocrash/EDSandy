@@ -1,33 +1,28 @@
 /**
- * AP_Expenses.gs
- * Write‑side helpers (addExpense, future edit/remove)
+ * AP_Expenses – single responsibility: write one row
+ * keep it dumb & synchronous for now
+ * - no CORS, no async, no promises, no nothing
+ * version 2323.073.22 stardate: 20250511.1006
  */
 var AP_Expenses = (function () {
+  const SHEET_NAME = 'Form Responses 6 Backup';
 
-    /**
-     * Adds one expense row to “Form Responses 6 Backup”.
-     * Expects payload: {date,amount,category,subcategory,description,payMethod,beneficiaries?}
-     * Returns {ok:true, expenseID:n}
-     */
-    function addExpense (data) {
-      const sheet = SpreadsheetApp.getActive()
-                      .getSheetByName('Form Responses 6 Backup');
-  
-      // --- TODO: validation / mapping ---
-      sheet.appendRow([
-        new Date(data.date),
-        data.amount,
-        data.category,
-        data.subcategory,
-        data.description,
-        data.payMethod || '',
-        (data.beneficiaries || []).join(',')   // CSV for now
-      ]);
-  
-      return { ok:true, expenseID: sheet.getLastRow() };
-    }
-  
-    return { addExpense };
-  
-  })();
-  
+  function addExpense(d) {
+    const sh = SpreadsheetApp.getActiveSpreadsheet()
+                             .getSheetByName(SHEET_NAME);
+
+    sh.appendRow([
+      new Date(d.date),            // assumes ms‑epoch from date input
+      +d.amount || 0,
+      d.category || '',
+      d.subcategory || '',
+      d.description || '',
+      d.payMethod || '',
+      (d.beneficiaries || []).join(',')   // "P001,P003"
+    ]);
+
+    return sh.getLastRow();        // row number (not used yet)
+  }
+
+  return { addExpense };
+})();
