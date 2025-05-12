@@ -34,6 +34,41 @@ function doGet(e) {
   }
 }
 
+// ─── Future AP_AddExpense.gs (inside AP_CategoryAPI for now) ───
+function doPost(e) {
+  try {
+    // `mode:'no-cors'` forces text/plain, so accept either JSON or form‑data
+    const data = e.postData.type === 'application/json'
+                 ? JSON.parse(e.postData.contents)
+                 : JSON.parse(e.parameter.payload || '{}');
+
+    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+                  .getSheetByName('Form Responses 6 Backup');
+
+    sheet.appendRow([
+      new Date(data.date),
+      Number(data.amount),
+      data.category,
+      data.subcategory,
+      data.description,
+      data.payMethod,
+      (data.beneficiaries || []).join(',')
+    ]);
+
+    // fire‑and‑forget response (browser can’t read it in no‑cors mode)
+    return ContentService
+           .createTextOutput('OK')
+           .setMimeType(ContentService.MimeType.TEXT);
+  } catch (err) {
+    // still return 200 so browser doesn’t complain
+    Logger.log(err);
+    return ContentService.createTextOutput('ERR');
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+
+/** OLD addExpense() function before May 5, 2025
 function doPost(e){
   const data = JSON.parse(e.postData.contents);
 
@@ -57,6 +92,6 @@ function doPost(e){
             JSON.stringify({ok:true, expenseID: sheet.getLastRow()}))
           .setMimeType(ContentService.MimeType.JSON);
 }
-
+*/
 
   
